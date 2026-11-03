@@ -47,17 +47,22 @@ Created by the Windows program for Neko Project II kai. `np2sys/np2kai/` holds t
 
 ## Releases
 
-Each archive contains `file_id.diz` for the BBS file listing. The description for each build is also stored under `release/`.
+Each archive contains `README.md` and `file_id.diz`. The description for each build is also stored under `release/`.
 
 | File | System |
 | --- | --- |
-| `pc98door-windows-386.zip` | 32-bit Windows, with the Neko Project core |
-| `pc98door-linux-amd64.tar.gz` | 64-bit Linux |
-| `pc98door-linux-386.tar.gz` | 32-bit Linux |
-| `pc98door-linux-arm64.tar.gz` | 64-bit ARM Linux |
+| `pc98door-windows-386.zip` | 32-bit Windows, with `np2kai_libretro.dll` |
+| `pc98door-linux-amd64.tar.gz` | 64-bit Linux, with `np2kai_libretro.so` |
+| `pc98door-linux-386.tar.gz` | 32-bit Linux, with `np2kai_libretro.so` |
+| `pc98door-linux-arm64.tar.gz` | 64-bit ARM Linux, with `np2kai_libretro.so` |
 
 ## Other programs
 
-The Windows core is Neko Project II kai built by libretro. The 32-bit DLL is checked in at `third_party/np2kai_libretro.dll`. That program is GPL-2.0, and its source is [libretro/NP2kai](https://github.com/libretro/NP2kai). The nightly this copy came from is `https://buildbot.libretro.com/nightly/windows/x86/latest/np2kai_libretro.dll.zip`.
+The Windows core is Neko Project II kai built by libretro. The 32-bit DLL is checked in at `third_party/np2kai_libretro.dll`. The Linux shared libraries are `third_party/linux-amd64/np2kai_libretro.so`, `third_party/linux-386/np2kai_libretro.so`, and `third_party/linux-arm64/np2kai_libretro.so`. That program is GPL-2.0, and its source is [libretro/NP2kai](https://github.com/libretro/NP2kai). These copies came from the libretro nightlies:
+
+- `https://buildbot.libretro.com/nightly/windows/x86/latest/np2kai_libretro.dll.zip`
+- `https://buildbot.libretro.com/nightly/linux/x86_64/latest/np2kai_libretro.so.zip`
+- `https://buildbot.libretro.com/nightly/linux/x86/latest/np2kai_libretro.so.zip`
+- `https://buildbot.libretro.com/nightly/linux/aarch64/latest/np2kai_libretro.so.zip`
 
 Tests decode JPEG XL with [jxl-go](third_party/jxl-go), which is MIT, copyright Ken Faulkner.

@@ -2,7 +2,7 @@ pc98door 1.0.0 for EleBBS
 PC-9801 menu for a local terminal
 64-bit ARM Linux build of the disk menu
 Games run on the 32-bit Windows build
-This build has no Neko Project core
+Includes np2kai_libretro.so
 Starting a disk reports that fact
 bios, roms, and save sit beside the program
 Firmware and disk images are not included
