@@ -41,6 +41,10 @@ func TestMenuSelectsDiskBySearch(t *testing.T) {
 	if !bytes.Contains(buf.Bytes(), []byte("Ctrl-Q quits the game")) {
 		t.Fatal("status omits Ctrl-Q")
 	}
+	frame := (&picker{user: "Ada Lovelace", all: disks}).frame()
+	if n := bytes.Count(frame, []byte("\n")); n != 24 {
+		t.Fatalf("menu is %d lines", n)
+	}
 }
 
 func TestLightbarHomeEndAndPages(t *testing.T) {
@@ -50,7 +54,7 @@ func TestLightbarHomeEndAndPages(t *testing.T) {
 	}
 	p := &picker{all: disks}
 	p.handle(keyEnd)
-	if p.sel != 39 || p.top != 21 {
+	if p.sel != 39 || p.top != 23 {
 		t.Fatalf("End sel=%d top=%d", p.sel, p.top)
 	}
 	p.handle(keyHome)
@@ -58,15 +62,15 @@ func TestLightbarHomeEndAndPages(t *testing.T) {
 		t.Fatalf("Home sel=%d top=%d", p.sel, p.top)
 	}
 	p.handle(keyPgDn)
-	if p.sel != 18 || p.top != 0 {
+	if p.sel != 16 || p.top != 0 {
 		t.Fatalf("first PgDn sel=%d top=%d", p.sel, p.top)
 	}
 	p.handle(keyPgDn)
-	if p.sel != 37 || p.top != 19 {
+	if p.sel != 33 || p.top != 17 {
 		t.Fatalf("second PgDn sel=%d top=%d", p.sel, p.top)
 	}
 	p.handle(keyPgUp)
-	if p.sel != 19 || p.top != 19 {
+	if p.sel != 17 || p.top != 17 {
 		t.Fatalf("PgUp to page top sel=%d top=%d", p.sel, p.top)
 	}
 	p.handle(keyPgUp)

@@ -26,7 +26,9 @@ const (
 	keyCtrl  = 0x20000
 
 	menuCols = 79
-	menuRows = 19
+	// 7 frame lines plus the title list. 24 lines fit a 25-line terminal;
+	// a 25th line scrolls the top border off the screen.
+	menuRows = 17
 )
 
 type keyboard interface {
