@@ -1,4 +1,4 @@
-//go:build !windows || !386
+//go:build !((windows && 386) || (linux && (386 || amd64 || arm64)))
 
 package main
 
@@ -8,5 +8,5 @@ import (
 )
 
 func playNP2(io.Writer, keyboard, string, string, string) error {
-	return fmt.Errorf("the door runs Neko Project as a 32-bit program")
+	return fmt.Errorf("Neko Project is not built for this system")
 }
