@@ -6,5 +6,4 @@ pc98-frame.jxl
 *.png
 np2sys/
 dist/
-third_party/*.dll
 third_party/*.zip

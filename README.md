@@ -8,7 +8,7 @@ Copyright (C) 2026 Martin Kazmaier. Licensed under the GNU General Public Licens
 
 The build that plays disks is the 32-bit Windows program. Put these beside `pc98door.exe`:
 
-- `np2kai_libretro.dll`, included in the Windows release
+- `np2kai_libretro.dll`, from `third_party/` or beside the executable. The Windows release zip already places it beside `pc98door.exe`
 - `bios/` with `bios.rom`, `font.rom`, `itf.rom`, and `sound.rom`
 - `roms/` with Anex86 `.hdi` disk images
 - `save/` is created per caller
@@ -34,6 +34,6 @@ Linux and ARM builds compile the menu and the local terminal. They do not includ
 
 ## Other programs
 
-The Windows core is Neko Project II kai built by libretro (`np2kai_libretro.dll`). That program is GPL-2.0, and its source is [libretro/NP2kai](https://github.com/libretro/NP2kai). The nightly this door was linked against is published at `https://buildbot.libretro.com/nightly/windows/x86/latest/np2kai_libretro.dll.zip`.
+The Windows core is Neko Project II kai built by libretro. The 32-bit DLL is checked in at `third_party/np2kai_libretro.dll`. That program is GPL-2.0, and its source is [libretro/NP2kai](https://github.com/libretro/NP2kai). The nightly this copy came from is `https://buildbot.libretro.com/nightly/windows/x86/latest/np2kai_libretro.dll.zip`.
 
 Tests decode JPEG XL with [jxl-go](third_party/jxl-go), which is MIT, copyright Ken Faulkner.
