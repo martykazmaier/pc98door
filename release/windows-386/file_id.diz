@@ -1,0 +1,10 @@
+pc98door 1.0.0 for EleBBS
+PC-9801 door for SyncTERM callers
+Lists disk images and runs Neko Project
+32-bit Windows with np2kai_libretro.dll
+Ctrl-Q leaves the game and returns
+door32.sys is read from the BBS node
+bios, roms, and save sit beside the exe
+Firmware and disk images are not included
+GPL-2.0-or-later, Martin Kazmaier 2026
+See README for each directory
