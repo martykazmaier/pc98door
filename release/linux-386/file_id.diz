@@ -1,9 +1,9 @@
 pc98door 1.0.0 for EleBBS
-PC-9801 menu for a local terminal
-32-bit Linux build of the disk menu
-Games run on the 32-bit Windows build
-Includes np2kai_libretro.so
-Starting a disk reports that fact
+PC-9801 door for SyncTERM callers
+Lists disk images and runs Neko Project
+32-bit Linux with np2kai_libretro.so
+Ctrl-Q leaves the game and returns
+Runs in the local terminal
 bios, roms, and save sit beside the program
 Firmware and disk images are not included
 GPL-2.0-or-later, Martin Kazmaier 2026

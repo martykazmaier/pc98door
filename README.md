@@ -6,7 +6,7 @@ Copyright (C) 2026 Martin Kazmaier. Licensed under the GNU General Public Licens
 
 ## Run
 
-The build that plays disks is the 32-bit Windows program. Unpack it so `pc98door.exe` and `np2kai_libretro.dll` are in the same directory. Linux builds show the menu on a local terminal. Starting a disk on Linux reports that the emulator runs as a 32-bit Windows program.
+Every release plays disks. The 32-bit Windows build is the EleBBS door: `pc98door.exe` loads `np2kai_libretro.dll` from the same directory and uses the inherited DOOR32 socket. Each Linux build loads `np2kai_libretro.so` from the same directory and plays on the local terminal. SyncTERM draws that terminal.
 
 `door32.sys` is read from the BBS working directory, the directory the node was in when it started the door. It is not read from beside the program. Line 6 of that file is the caller's real name. `-L` forces the local console instead of the inherited socket.
 
@@ -29,7 +29,7 @@ Shared firmware for every caller. Put these files here. Names are matched withou
 - `itf.rom`
 - `sound.rom`
 
-On Windows, the first time a disk starts, every file in `bios/` is copied to `np2sys/np2kai/`. Leave the originals in `bios/`. Do not put disk images here.
+The first time a disk starts, every file in `bios/` is copied to `np2sys/np2kai/`. Leave the originals in `bios/`. Do not put disk images here.
 
 ### roms
 
@@ -41,7 +41,7 @@ One directory per caller. The folder name is the real name from line 6 of `door3
 
 ### np2sys
 
-Created by the Windows program for Neko Project II kai. `np2sys/np2kai/` holds the copied firmware and the core's `np2kai.cfg`. Do not put firmware or disks here yourself. The core uses this copy so it can write its config without changing `bios/`.
+Created when a disk starts. `np2sys/np2kai/` holds the copied firmware and the core's `np2kai.cfg`. Do not put firmware or disks here yourself. The core uses this copy so it can write its config without changing `bios/`.
 
 `pc98door.log` is written beside the program.
 

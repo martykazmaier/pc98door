@@ -9,14 +9,23 @@ import (
 )
 
 // stdTerm is the local terminal used by builds other than Windows.
-// DOOR32 inherited sockets are a Windows BBS facility.
+// DOOR32 inherited sockets are a Windows BBS facility. SyncTERM on Linux
+// reads the same JPEG XL and mouse sequences from this terminal.
 type stdTerm struct {
-	in chan byte
-	cr bool
+	in      chan byte
+	cr      bool
+	push    []byte
+	btn     int
+	mice    []mouseSample
+	restore func()
 }
 
 func openConsole() (*stdTerm, error) {
-	t := &stdTerm{in: make(chan byte, 256)}
+	restore, err := prepareConsole()
+	if err != nil {
+		return nil, err
+	}
+	t := &stdTerm{in: make(chan byte, 256), restore: restore}
 	go func() {
 		buf := make([]byte, 1)
 		for {
@@ -37,11 +46,38 @@ func openDoorSocket(uintptr) (*stdTerm, error) {
 	return nil, fmt.Errorf("DOOR32 sockets are provided by the Windows build")
 }
 
-func (t *stdTerm) Close() error { return nil }
+func (t *stdTerm) Close() error {
+	if t.restore != nil {
+		t.restore()
+	}
+	return nil
+}
 
 func (t *stdTerm) Write(p []byte) (int, error) { return os.Stdout.Write(p) }
 
+func (t *stdTerm) JXL() bool { return true }
+
+func (t *stdTerm) TakeMouse() []mouseSample {
+	v := t.mice
+	t.mice = nil
+	return v
+}
+
+func (t *stdTerm) noteMouse(params string, final byte) {
+	x, y, btn, ok := parseSGR(params, final, t.btn)
+	if !ok {
+		return
+	}
+	t.btn = btn
+	t.mice = append(t.mice, mouseSample{x: x, y: y, btn: btn})
+}
+
 func (t *stdTerm) readByte(d time.Duration) (byte, error) {
+	if len(t.push) > 0 {
+		b := t.push[0]
+		t.push = t.push[1:]
+		return b, nil
+	}
 	if d < 0 {
 		b, ok := <-t.in
 		if !ok {
@@ -60,6 +96,19 @@ func (t *stdTerm) readByte(d time.Duration) (byte, error) {
 	case <-timer.C:
 		return 0, errTimeout
 	}
+}
+
+func (t *stdTerm) consumeReport() (int, bool, error) {
+	for i := 0; i < 48; i++ {
+		c, err := t.readByte(80 * time.Millisecond)
+		if err != nil {
+			return keyNone, false, nil
+		}
+		if c >= 0x40 && c <= 0x7E {
+			return keyNone, false, nil
+		}
+	}
+	return keyNone, false, nil
 }
 
 func (t *stdTerm) WaitKey(d time.Duration) (int, bool, error) {
@@ -83,6 +132,10 @@ func (t *stdTerm) WaitKey(d time.Duration) (int, bool, error) {
 		return keyEsc, true, nil
 	}
 	if intro != '[' && intro != 'O' {
+		if intro == '=' || intro == '<' {
+			return t.consumeReport()
+		}
+		t.push = append(t.push, intro)
 		return keyEsc, true, nil
 	}
 	var params []byte
@@ -92,6 +145,10 @@ func (t *stdTerm) WaitKey(d time.Duration) (int, bool, error) {
 			return keyEsc, true, nil
 		}
 		if c >= 0x40 && c <= 0x7E {
+			if len(params) > 0 && params[0] == '<' && (c == 'M' || c == 'm') {
+				t.noteMouse(string(params), c)
+				return keyNone, false, nil
+			}
 			return mapSeq(intro, string(params), c), true, nil
 		}
 		params = append(params, c)
