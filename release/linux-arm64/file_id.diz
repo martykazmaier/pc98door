@@ -2,7 +2,7 @@ pc98door 1.0.0 for EleBBS
 PC-9801 door for SyncTERM callers
 Lists disk images and runs Neko Project
 64-bit ARM Linux with np2kai_libretro.so
-Ctrl-Q leaves the game and returns
+Ctrl-Q or a DOS prompt returns
 Runs in the local terminal
 bios, roms, and save sit beside the program
 Firmware and disk images are not included

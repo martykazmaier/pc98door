@@ -1,6 +1,6 @@
 # pc98door
 
-pc98door is a PC-9801 door for EleBBS and SyncTERM. It lists the disk images in `roms/`, and Enter starts the highlighted disk in [Neko Project II kai](https://github.com/libretro/NP2kai). Ctrl-Q leaves the game and returns to the menu.
+pc98door is a PC-9801 door for EleBBS and SyncTERM. It lists the disk images in `roms/`, and Enter starts the highlighted disk in [Neko Project II kai](https://github.com/libretro/NP2kai). Ctrl-Q leaves the game and returns to the menu. A game that exits to the DOS prompt returns to the menu as well.
 
 Copyright (C) 2026 Martin Kazmaier. Licensed under the GNU General Public License, version 2 or any later version. See [LICENSE](LICENSE).
 

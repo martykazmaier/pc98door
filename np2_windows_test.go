@@ -58,4 +58,21 @@ func TestNP2Paints(t *testing.T) {
 	if maxC < 250 {
 		t.Fatalf("picture is black, max channel %d", maxC)
 	}
+	font, err := loadANK(`\\bbs\ele\doors\pc98\bios`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	view := frameView{raw: np2Frame, width: np2W, height: np2H, pitch: np2Pitch, pix: np2Pix}
+	var text []string
+	for row := 0; row < np2H/16; row++ {
+		line := strings.TrimRight(readRow(font, view, row, 80), " ")
+		if line != "" {
+			text = append(text, line)
+		}
+	}
+	joined := strings.Join(text, "\n")
+	t.Logf("text:\n%s", joined)
+	if !strings.Contains(joined, "CPU") || !strings.Contains(joined, "MEMORY") {
+		t.Fatal("boot text did not match the font")
+	}
 }

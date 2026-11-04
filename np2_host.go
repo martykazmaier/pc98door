@@ -62,10 +62,16 @@ func playNP2(w io.Writer, keys keyboard, disk, root, bios string) error {
 		}()
 		_, _, _ = keys.WaitKey(150 * time.Millisecond)
 	}
+	watch := openPromptWatch(bios)
 	next := time.Time{}
 	var sum uint64
+	var tick int
 	for {
 		call0(np2Run)
+		tick++
+		if watch != nil && tick%8 == 0 && watch.step(np2Frame, np2W, np2H, np2Pitch, np2Pix) {
+			return nil
+		}
 		for id, left := range np2Keys {
 			if left <= 1 {
 				delete(np2Keys, id)
