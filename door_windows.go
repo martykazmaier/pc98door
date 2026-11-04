@@ -350,6 +350,17 @@ func (s *socketDoor) readByte(d time.Duration) (byte, error) {
 		}
 		return b, nil
 	}
+	if d == 0 {
+		select {
+		case b, ok := <-s.raw:
+			if !ok {
+				return 0, io.EOF
+			}
+			return b, nil
+		default:
+			return 0, errTimeout
+		}
+	}
 	t := time.NewTimer(d)
 	defer t.Stop()
 	select {
@@ -368,46 +379,60 @@ func (s *socketDoor) WaitKey(d time.Duration) (int, bool, error) {
 	if d < 0 {
 		wait = -1
 	}
-	b, err := s.readByte(wait)
-	if err == errTimeout {
-		return 0, false, nil
-	}
-	if err != nil {
-		return 0, false, err
-	}
-	if b != 27 {
-		k, cr := mapByte(b, s.cr)
-		s.cr = cr
-		if k == keyNone {
+	for {
+		b, err := s.readByte(wait)
+		if err == errTimeout {
 			return 0, false, nil
 		}
-		return k, true, nil
-	}
-	intro, err := s.readByte(80 * time.Millisecond)
-	if err == errTimeout || err != nil {
-		return keyEsc, true, nil
-	}
-	if intro != '[' && intro != 'O' {
-		if intro == '=' || intro == '<' {
-			return s.consumeReport()
-		}
-		s.push = append(s.push, intro)
-		return keyEsc, true, nil
-	}
-	var params []byte
-	for i := 0; i < 32; i++ {
-		c, err := s.readByte(80 * time.Millisecond)
 		if err != nil {
+			return 0, false, err
+		}
+		if b != 27 {
+			k, cr := mapByte(b, s.cr)
+			s.cr = cr
+			if k == keyNone {
+				wait = 0
+				continue
+			}
+			return k, true, nil
+		}
+		intro, err := s.readByte(80 * time.Millisecond)
+		if err == errTimeout || err != nil {
 			return keyEsc, true, nil
 		}
-		if c >= 0x40 && c <= 0x7E {
-			if len(params) > 0 && params[0] == '<' && (c == 'M' || c == 'm') {
-				s.noteMouse(string(params), c)
-				return keyNone, false, nil
+		if intro != '[' && intro != 'O' {
+			if intro == '=' || intro == '<' {
+				_, _, _ = s.consumeReport()
+				wait = 0
+				continue
 			}
-			return mapSeq(intro, string(params), c), true, nil
+			s.push = append(s.push, intro)
+			return keyEsc, true, nil
 		}
-		params = append(params, c)
+		var params []byte
+		mouse := false
+		for i := 0; i < 32; i++ {
+			c, err := s.readByte(80 * time.Millisecond)
+			if err != nil {
+				return keyEsc, true, nil
+			}
+			if c >= 0x40 && c <= 0x7E {
+				if len(params) > 0 && params[0] == '<' && (c == 'M' || c == 'm') {
+					s.noteMouse(string(params), c)
+					mouse = true
+				} else {
+					return mapSeq(intro, string(params), c), true, nil
+				}
+				break
+			}
+			params = append(params, c)
+		}
+		if mouse {
+			// A flick is many pixel reports. Keep them for this frame
+			// instead of handing the game one pixel per frame.
+			wait = 0
+			continue
+		}
+		return keyNone, false, nil
 	}
-	return keyNone, false, nil
 }

@@ -65,6 +65,17 @@ func playNP2(w io.Writer, keys keyboard, disk, root, bios string) error {
 	next := time.Time{}
 	var sum uint64
 	for {
+		k, ok, err := keys.WaitKey(12 * time.Millisecond)
+		if err != nil {
+			return err
+		}
+		if ok {
+			if k == keyCtrlQ {
+				return nil
+			}
+			holdKey(k)
+		}
+		takeMice(keys)
 		call0(np2Run)
 		for id, left := range np2Keys {
 			if left <= 1 {
@@ -73,7 +84,6 @@ func playNP2(w io.Writer, keys keyboard, disk, root, bios string) error {
 				np2Keys[id] = left - 1
 			}
 		}
-		takeMice(keys)
 		if useJXL {
 			if err := flushAudio(w); err != nil {
 				return err
@@ -95,17 +105,6 @@ func playNP2(w io.Writer, keys keyboard, disk, root, bios string) error {
 			np2Dirty = false
 			next = time.Now().Add(100 * time.Millisecond)
 		}
-		k, ok, err := keys.WaitKey(12 * time.Millisecond)
-		if err != nil {
-			return err
-		}
-		if !ok {
-			continue
-		}
-		if k == keyCtrlQ {
-			return nil
-		}
-		holdKey(k)
 	}
 }
 

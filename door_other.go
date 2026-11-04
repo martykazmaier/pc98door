@@ -85,6 +85,17 @@ func (t *stdTerm) readByte(d time.Duration) (byte, error) {
 		}
 		return b, nil
 	}
+	if d == 0 {
+		select {
+		case b, ok := <-t.in:
+			if !ok {
+				return 0, os.ErrClosed
+			}
+			return b, nil
+		default:
+			return 0, errTimeout
+		}
+	}
 	timer := time.NewTimer(d)
 	defer timer.Stop()
 	select {
@@ -112,46 +123,59 @@ func (t *stdTerm) consumeReport() (int, bool, error) {
 }
 
 func (t *stdTerm) WaitKey(d time.Duration) (int, bool, error) {
-	b, err := t.readByte(d)
-	if err == errTimeout {
-		return 0, false, nil
-	}
-	if err != nil {
-		return 0, false, err
-	}
-	if b != 27 {
-		k, cr := mapByte(b, t.cr)
-		t.cr = cr
-		if k == keyNone {
+	wait := d
+	for {
+		b, err := t.readByte(wait)
+		if err == errTimeout {
 			return 0, false, nil
 		}
-		return k, true, nil
-	}
-	intro, err := t.readByte(80 * time.Millisecond)
-	if err != nil {
-		return keyEsc, true, nil
-	}
-	if intro != '[' && intro != 'O' {
-		if intro == '=' || intro == '<' {
-			return t.consumeReport()
+		if err != nil {
+			return 0, false, err
 		}
-		t.push = append(t.push, intro)
-		return keyEsc, true, nil
-	}
-	var params []byte
-	for i := 0; i < 32; i++ {
-		c, err := t.readByte(80 * time.Millisecond)
+		if b != 27 {
+			k, cr := mapByte(b, t.cr)
+			t.cr = cr
+			if k == keyNone {
+				wait = 0
+				continue
+			}
+			return k, true, nil
+		}
+		intro, err := t.readByte(80 * time.Millisecond)
 		if err != nil {
 			return keyEsc, true, nil
 		}
-		if c >= 0x40 && c <= 0x7E {
-			if len(params) > 0 && params[0] == '<' && (c == 'M' || c == 'm') {
-				t.noteMouse(string(params), c)
-				return keyNone, false, nil
+		if intro != '[' && intro != 'O' {
+			if intro == '=' || intro == '<' {
+				_, _, _ = t.consumeReport()
+				wait = 0
+				continue
 			}
-			return mapSeq(intro, string(params), c), true, nil
+			t.push = append(t.push, intro)
+			return keyEsc, true, nil
 		}
-		params = append(params, c)
+		var params []byte
+		mouse := false
+		for i := 0; i < 32; i++ {
+			c, err := t.readByte(80 * time.Millisecond)
+			if err != nil {
+				return keyEsc, true, nil
+			}
+			if c >= 0x40 && c <= 0x7E {
+				if len(params) > 0 && params[0] == '<' && (c == 'M' || c == 'm') {
+					t.noteMouse(string(params), c)
+					mouse = true
+				} else {
+					return mapSeq(intro, string(params), c), true, nil
+				}
+				break
+			}
+			params = append(params, c)
+		}
+		if mouse {
+			wait = 0
+			continue
+		}
+		return keyNone, false, nil
 	}
-	return keyNone, false, nil
 }

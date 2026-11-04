@@ -20,3 +20,19 @@ func TestSGRMouseButtons(t *testing.T) {
 		t.Fatalf("release %+v", got[2])
 	}
 }
+
+func TestWaitKeyDrainsMouse(t *testing.T) {
+	s := &socketDoor{raw: make(chan byte, 64)}
+	seq := []byte("\x1b[<0;11;21M\x1b[<0;31;41M\x1b[<0;81;91M")
+	for _, b := range seq {
+		s.raw <- b
+	}
+	k, ok, err := s.WaitKey(0)
+	if err != nil || ok || k != 0 {
+		t.Fatalf("WaitKey = %d %v %v", k, ok, err)
+	}
+	got := s.TakeMouse()
+	if len(got) != 3 || got[0].x != 10 || got[1].x != 30 || got[2].x != 80 {
+		t.Fatalf("samples %+v", got)
+	}
+}
