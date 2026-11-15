@@ -1,12 +1,12 @@
 # pc98door
 
-pc98door is a PC-9801 door for EleBBS and SyncTERM. It lists the disk images in `roms/`, and Enter starts the highlighted disk in [Neko Project II kai](https://github.com/libretro/NP2kai). Ctrl-Q leaves the game and returns to the menu. A game that exits to the DOS prompt returns to the menu as well.
+pc98door is a PC-9801 door for any BBS that provides DOOR32.SYS. It lists the disk images in `roms/`, and Enter starts the highlighted disk in [Neko Project II kai](https://github.com/libretro/NP2kai). Ctrl-Q leaves the game and returns to the menu. A game that exits to the DOS prompt returns to the menu as well.
 
 Copyright (C) 2026 Martin Kazmaier. Licensed under the GNU General Public License, version 2 or any later version. See [LICENSE](LICENSE).
 
 ## Run
 
-Every release plays disks. The 32-bit Windows build is the EleBBS door: `pc98door.exe` loads `np2kai_libretro.dll` from the same directory and uses the inherited DOOR32 socket. Each Linux build loads `np2kai_libretro.so` from the same directory and plays on the local terminal. SyncTERM draws that terminal.
+Every release plays disks. The 32-bit Windows build is the DOOR32 door: `pc98door.exe` loads `np2kai_libretro.dll` from the same directory and uses the socket handle from `DOOR32.SYS`. Any BBS that writes that file can run it. Each Linux build loads `np2kai_libretro.so` from the same directory and plays on the local terminal. The picture, mouse, and sound use SyncTERM drawing sequences.
 
 `door32.sys` is read from the BBS working directory, the directory the node was in when it started the door. It is not read from beside the program. Line 6 of that file is the caller's real name. `-L` forces the local console instead of the inherited socket.
 

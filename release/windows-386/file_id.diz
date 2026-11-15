@@ -1,5 +1,5 @@
-pc98door 1.0.0 for EleBBS
-PC-9801 door for SyncTERM callers
+pc98door 1.0.0 for DOOR32.SYS
+Runs on any DOOR32.SYS BBS
 Lists disk images and runs Neko Project
 32-bit Windows with np2kai_libretro.dll
 Ctrl-Q or a DOS prompt returns
