@@ -6,7 +6,7 @@ Copyright (C) 2026 Martin Kazmaier. Licensed under the GNU General Public Licens
 
 ## Run
 
-Every release plays disks. The 32-bit Windows build is the DOOR32 door: `pc98door.exe` loads `np2kai_libretro.dll` from the same directory and uses the socket handle from `DOOR32.SYS`. Any BBS that writes that file can run it. Each Linux build loads `np2kai_libretro.so` from the same directory and plays on the local terminal. The picture, mouse, and sound use SyncTERM drawing sequences.
+Every release plays disks. The 32-bit Windows build is the DOOR32 door: `pc98door.exe` loads `np2kai_libretro.dll` from the same directory and uses the socket handle from `DOOR32.SYS`. Any BBS that writes that file can run it. Each Linux build loads `np2kai_libretro.so` from the same directory and plays on the local terminal. The picture, mouse, and sound work in any terminal that supports JXL and APC.
 
 `door32.sys` is read from the BBS working directory, the directory the node was in when it started the door. It is not read from beside the program. Line 6 of that file is the caller's real name. `-L` forces the local console instead of the inherited socket.
 
